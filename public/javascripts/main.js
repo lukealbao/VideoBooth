@@ -1,5 +1,5 @@
 // Do the vendor prefix dance
-navigator.getUserMedia  = navigator.getUserMedia    || navigator.webkitGetUserMedia ||
+navigator.getUserMedia  =  navigator.getUserMedia    || navigator.webkitGetUserMedia ||
                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
 function VideoBooth(options) {
@@ -29,7 +29,15 @@ VideoBooth.prototype.errCallback = function(e) {
 
 VideoBooth.prototype.requestMedia = function() {
   // Use the vendor prefixed getUserMedia we set up above and request just video
-  navigator.getUserMedia({ video: true, audio: true }, this.showMedia.bind(this), this.errCallback.bind(this));
+  navigator.getUserMedia({
+    video: {
+      mandatory: {
+        minWidth: 1280,
+        minHeight: 720
+      }
+    },
+    audio: true
+  }, this.showMedia.bind(this), this.errCallback.bind(this));
 };
 
 VideoBooth.prototype.showMedia = function(stream) {
@@ -52,7 +60,7 @@ VideoBooth.prototype.start = function(seconds, cb) {
 
   $(this.videoEl).addClass('recording');
 
-  setTimeout(this.stop.bind(this, cb), seconds * 1000);
+  //setTimeout(this.stop.bind(this, cb), seconds * 1000);
   this.countdown(seconds);
 };
 
@@ -90,6 +98,8 @@ VideoBooth.prototype.playBackRecorded = function(blob) {
 };
 
 VideoBooth.prototype.upload = function(cb) {
+  console.log('deprecating #upload');
+  return;
   var recording = this.recording;
   if (!recording) { throw new Error('No recording to upload.'); }
 
@@ -99,10 +109,11 @@ VideoBooth.prototype.upload = function(cb) {
   $uploadProgress.text('0%');
 
   // Grab a signed URL from the backend
-  $.post('/upload', { key: filename }).done(function(data) {
-    formUpload(data.url, data.cors.key, data.cors.policy, data.cors.signature, filename, recording);
-  });
+  // $.post('/upload', { key: filename }).done(function(data) {
+  //   formUpload(data.url, data.cors.key, data.cors.policy, data.cors.signature, filename, recording);
+  // });
 
+  formUpload('/process', 'key', 'policy', 'signature', filename, recording);
   function formUpload(url, accessKey, policy, signature, filename, data) {
     var fd = new FormData();
 
@@ -142,10 +153,28 @@ VideoBooth.prototype.upload = function(cb) {
   }
 };
 
+VideoBooth.prototype.send = function(recording, cb) {
+  var reader = new window.FileReader();
+  reader.onloadend = function() {
+    var dataString = reader.result;          
+    $.post('/process', {
+      filename: 'recording-' + (new Date()).getTime() + '.wm',
+      recording: dataString
+    }).done(function(data) {
+      cb(null, data);
+    }).fail(function(data) {
+      cb(data);
+    });
+  };
+  reader.readAsDataURL(recording);  
+};
+
 VideoBooth.prototype.process = function(email, cb) {
+  recording = this.recording;
   $.post('/process', {
     filename: this.filename,
-    email: email
+    email: email,
+    recording: this.recording
   }).done(function(data) {
     cb(null, data);
   }).fail(function(data) {
@@ -169,6 +198,7 @@ $(function() {
 
     $(this).addClass('hidden');
     $('#record').removeClass('hidden');
+    $('#stop').removeClass('hidden');
   });
 
   $('#record').click(function(e) {
@@ -180,30 +210,30 @@ $(function() {
     });
   });
 
-  $('#upload').click(function(e) {
+  $('#stop').click(function(e) {
     e.preventDefault();
 
-    booth.upload(function(err) {
-      if (err) {
-        booth.alert('danger', 'Upload failure!');
-        console.log(err.responseText);
-        return console.log(err);
-      }
-
+    // Kick off a 5 second recording!
+    booth.stop(function() {
+      $('#recorded-media, #upload').removeClass('hidden');
+      $('#download').removeClass('hidden');
       $('#process').removeClass('hidden');
+
+      // setTimeout(function () { // timeout, booth.recording was undefined
+      //   booth.send(booth.recording, function(err, job) {
+      //     if (err) { return booth.alert('danger', 'Job creation failed :('); }
+      //     booth.alert('cool');
+      //   });
+      // }, 100);
     });
   });
-
+  
   $('#process').click(function(e) {
     e.preventDefault();
 
-    // Get an email address via a prompt
-    var email = window.prompt("What's your email address? We'll email you a link to the finished video.");
-
-    booth.process(email, function(err, job) {
+    booth.send(booth.recording, function(err, job) {
       if (err) { return booth.alert('danger', 'Job creation failed :('); }
-
-      booth.alert('success', "<strong>Processing started!</strong> We'll email you at <strong>"+email+"</strong> when it's done. Zencoder job id: "+ job.id);
+      booth.alert('cool');
     });
   });
 });

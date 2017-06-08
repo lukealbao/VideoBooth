@@ -1,14 +1,7 @@
-var S3_BUCKET = 'zen-tests';
-
 var express    = require('express');
 var path       = require('path');
 var logger     = require('morgan');
 var bodyParser = require('body-parser');
-var crypto     = require('crypto');
-var moment     = require('moment');
-var AWS        = require('aws-sdk');
-var s3         = new AWS.S3({ params: { Bucket: S3_BUCKET }});
-var zencoder   = require('zencoder')();
 var fs = require('fs');
 
 var app = express();
@@ -23,8 +16,8 @@ app.post('/process', function(req, res) {
   var filename = req.body.filename;
   var recording = req.body.recording;
   
-  var size = Math.ceil(recording.length / 1e6);
-  var file = fs.createWriteStream('./' + filename, {flags: 'w'});
+  var size = Math.floor(recording.length / 1e6);
+  var file = fs.createWriteStream('./videos/' + filename, {flags: 'w'});
   var buffer = new Buffer(recording, 'base64');
   // Remove metadata header 15 bytes
   buffer = buffer.slice(15);
