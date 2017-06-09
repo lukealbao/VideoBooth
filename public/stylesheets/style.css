@@ -2,7 +2,7 @@
   border: 3px solid red;
 }
 
-.hidden {
+.hidden {    
   display: none;
 }
 
@@ -14,4 +14,46 @@
 
 .logo-banner img {
   max-width: 100%;
+}
+video#user-media {
+  transform: rotateY(180deg);
+  width: 960px;
+}
+button.recording {
+}
+div#alerts {
+  
+}
+.video-alert {
+  height: 2em;
+  transition: all 1s linear;
+}
+div.video-overlay {
+    z-index: 9999;
+    background: rgba(64,64,64,0.75);
+    position: absolute;
+    font-size: 36px;
+    color: white;
+    top: 180px;
+    right: 0;
+    width: 960px;
+    height: 135px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.record-marker {
+    color: red;
+    margin-right: 0.5em;
+    animation: 1s linear 0s infinite alternate blink_recorder;    
+}
+
+@keyframes blink_recorder {
+    from {
+        opacity: 0.5;
+    }
+    to {
+        opacity: 1;
+    }
 }

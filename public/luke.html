@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>VideoBooth</title>
+        <title>💕🎥💕🎥💕🎥</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -19,19 +19,23 @@
             <div id="alerts"></div>
 
             <p>
-                <a id="record" class="btn btn-danger">Record <span id="countdown"></span></a>
+                <a id="record" class="btn btn-success"><span style="color: red;">◉</span> Start Recording<span id="countdown"></span></a>
                 <a id="stop" class="btn btn-danger">Stop</a>
                 <a id="process" class="btn btn-info">Process!</a>
             </p>
 
             <div class="row">
                 <div class="col-md-6">
+                    <div class="video-overlay hidden" id="recording-overlay">
+                        <span class="record-marker">◉</span>
+                        Look at the camera! 👆🏼
+                    </div>
                     <video id="user-media" autoplay muted width="100%"></video>
                 </div>
             </div>
         </div>
 
         <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="/javascripts/main.js"></script>
-  </body>
+        <script src="/javascripts/main-2.js"></script>
+    </body>
 </html>

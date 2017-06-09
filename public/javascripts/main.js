@@ -191,15 +191,12 @@ $(function() {
     alertEl: 'alerts'
   });
 
-  $('#get-user-media').click(function(e) {
+  window.onload = function(e) {
     e.preventDefault();
 
     booth.requestMedia();
+  };
 
-    $(this).addClass('hidden');
-    $('#record').removeClass('hidden');
-    $('#stop').removeClass('hidden');
-  });
 
   $('#record').click(function(e) {
     e.preventDefault();
