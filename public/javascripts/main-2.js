@@ -103,8 +103,8 @@ VideoBooth.prototype.send = function(recording, cb) {
       recording: dataString
     }).done(function(data) {
       cb(null, data);
-    }).fail(function(data) {
-      cb(data);
+    }).fail(function(err) {
+      cb(err);
     });
   };
   reader.readAsDataURL(recording);  
@@ -124,16 +124,7 @@ $(function() {
 
     booth.requestMedia();
   };
-
-  // $('#record').click(function(e) {
-  //   e.preventDefault();
-  //   console.log('record.click');
-
-  //   return (booth.isRecording)
-  //     ? stopRecordingCb(e)
-  //     : startRecordingCb(e);
-  // });
-
+  
   $('#record').click(function (e) {
     if (booth.state === 'idle') {
       booth.start(5, function() {
@@ -161,38 +152,6 @@ $(function() {
           .html('<span style="color: red;">◉</span> Start Recording');      
       });
     }
-  });
-  function stopRecordingCb (e) {
-    e.preventDefault();
-    console.log('stoprecording');
-
-    booth.stop(function() {
-      booth.isRecording = false;
-
-      $('#recorded-media, #upload').removeClass('hidden');
-      $('#download').removeClass('hidden');
-      $('#process').removeClass('hidden');
-      $('#recording-overlay').addClass('hidden');
-      $('#record')
-        .removeClass('btn-danger')
-        .addClass('btn btn-success')
-        .html('<span style="color: red;">◉</span> Start Recording');      
-    });
-  }
-  
-  $('#stop').click(function(e) {
-    e.preventDefault();
-
-    booth.stop(function() {
-      $('#recorded-media, #upload').removeClass('hidden');
-      $('#download').removeClass('hidden');
-      $('#process').removeClass('hidden');
-      $('#recording-overlay').addClass('hidden');
-      $('#record')
-        .removeClass('btn-danger')
-        .addClass('btn btn-success')
-        .html('<span style="color: red;">◉</span> Start Recording');      
-    });
   });
   
   $('#process').click(function(e) {
