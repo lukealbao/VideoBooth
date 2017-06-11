@@ -125,6 +125,7 @@ $(function() {
   
   $('#record').click(function (e) {
     e.preventDefault();
+    booth.requestMedia();
     
     if (booth.state === 'idle') {
       booth.start(function() {
