@@ -1,8 +1,6 @@
 /*
  * This thing doesn't actually work, but it has good things in it.
 */
-navigator.getUserMedia  =  navigator.getUserMedia    || navigator.webkitGetUserMedia ||
-                          navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
 function VideoBooth(options) {
   this.state = 'idle';
@@ -73,7 +71,7 @@ VideoBooth.prototype.showMedia = function(stream) {
   };
 };
 
-VideoBooth.prototype.start = function(seconds, cb) {
+VideoBooth.prototype.start = function(cb) {
   if (!this.stream) { throw new Error('No stream available to record'); }
   if (!window.MediaRecorder) { alert("This browser doesn't support MediaRecorder. :( Firefox only for now!"); }
 
@@ -127,7 +125,7 @@ $(function() {
   
   $('#record').click(function (e) {
     if (booth.state === 'idle') {
-      booth.start(5, function() {
+      booth.start(function() {
         booth.state = 'recording';
         
         $('#record')
@@ -135,23 +133,38 @@ $(function() {
           .addClass('btn btn-danger')
           .html('▣ Stop Recording');
         
-        $(this.videoEl).addClass('recording');
+        $(booth.videoEl).addClass('recording');
         $('#recording-overlay').removeClass('hidden');
       });
     } else if (booth.state === 'recording') {
       booth.stop(function() {
-        booth.state = 'idle';
-
-        $('#recorded-media, #upload').removeClass('hidden');
-        $('#download').removeClass('hidden');
-        $('#process').removeClass('hidden');
-        $('#recording-overlay').addClass('hidden');
+        booth.state = 'unsaved';
+        $('#process, #discard')
+          .removeClass('hidden');
+        
         $('#record')
-          .removeClass('btn-danger')
-          .addClass('btn btn-success')
-          .html('<span style="color: red;">◉</span> Start Recording');      
+          .addClass('disabled')
+          .html('Unsaved Recording');
+
+        $('#process').removeClass('hidden');
+        $('#recording-overlay').addClass('hidden');        
       });
     }
+  });
+
+  $('#discard').click(function (e) {
+    e.preventDefault();
+
+    booth.state = 'idle';
+    booth.recording = null;
+
+    booth.alert(null, 'Not saved');
+    $('#process, #discard').addClass('hidden');
+    $('#record')
+      .removeClass('btn-danger')
+      .removeClass('disabled')
+      .addClass('btn-success')
+      .html('<span style="color: red;">◉</span> New Recording');
   });
   
   $('#process').click(function(e) {
@@ -159,6 +172,19 @@ $(function() {
 
     booth.send(booth.recording, function(err, job) {
       if (err) { return booth.alert('danger', 'Job creation failed :('); }
+      else {
+        booth.state = 'idle';
+        booth.recording = null;
+
+        booth.alert('success', 'Thanks!');
+        $('#process, #discard').addClass('hidden');
+        
+        $('#record')
+          .removeClass('btn-danger')
+          .removeClass('disabled')
+          .addClass('btn-success')
+          .html('<span style="color: red;">◉</span> New Recording');      
+      }
     });
   });
 });

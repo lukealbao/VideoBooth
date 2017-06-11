@@ -22,10 +22,10 @@ video#user-media {
 button.recording {
 }
 div#alerts {
-  
 }
 .video-alert {
   height: 2em;
+  opacity: 0;
   transition: all 1s linear;
 }
 div.video-overlay {
