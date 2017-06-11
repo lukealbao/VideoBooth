@@ -124,6 +124,8 @@ $(function() {
   };
   
   $('#record').click(function (e) {
+    e.preventDefault();
+    
     if (booth.state === 'idle') {
       booth.start(function() {
         booth.state = 'recording';
