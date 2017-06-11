@@ -167,7 +167,7 @@ $(function() {
       .removeClass('btn-danger')
       .removeClass('disabled')
       .addClass('btn-success')
-      .html('<span style="color: red;">◉</span> New Recording');
+      .html('<span style="color: red;">◉</span> Start Recording');
   });
   
   $('#process').click(function(e) {
@@ -186,7 +186,7 @@ $(function() {
           .removeClass('btn-danger')
           .removeClass('disabled')
           .addClass('btn-success')
-          .html('<span style="color: red;">◉</span> New Recording');      
+          .html('<span style="color: red;">◉</span> Start Recording');      
       }
     });
   });
